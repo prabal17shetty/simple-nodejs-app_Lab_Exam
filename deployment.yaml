@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-nodejs-app
+  labels:
+    app: simple-nodejs-app
+spec:
+  replicas: 3  # Number of pod replicas to run
+  selector:
+    matchLabels:
+      app: simple-nodejs-app
+  template:
+    metadata:
+      labels:
+        app: simple-nodejs-app
+    spec:
+      containers:
+        - name: simple-nodejs-app
+          image: prabal17shetty/simple-nodejs-app:latest  # Use your built image here
+          ports:
+            - containerPort: 3000  # Expose port 3000 (or the port your app uses)
+          env:
+            - name: NODE_ENV
+              value: "production"  # Example environment variable (optional)
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-nodejs-app-service
+spec:
+  selector:
+    app: simple-nodejs-app
+  ports:
+    - protocol: TCP
+      port: 80  # Port exposed by the service
+      targetPort: 3000  # Port exposed by the container
+  type: LoadBalancer  # Change this if you want another type of service, e.g., ClusterIP or NodePort
